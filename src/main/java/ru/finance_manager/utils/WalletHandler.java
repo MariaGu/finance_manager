@@ -9,13 +9,12 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 
-public class BudgetHandler {
-    static Scanner scanner = new Scanner(System.in);
+public class WalletHandler {
 
-    public static User addOperation(DataBase DataBase, User user) {
+    public static User addOperation(DataBase DataBase, User user, Scanner scanner) {
         ArrayList<Category> userCategories = DataBase.getAllUserCategories(user);
         if (userCategories.isEmpty()) {
-            System.out.println("Сначала вам нужно создать категорию операции");
+            System.out.println("Создайте категорию операции");
         }
         System.out.println("""
                             Введите тип добавляемой операции:
@@ -28,8 +27,6 @@ public class BudgetHandler {
         if (userInput.equals("1")) {
             for (Category category: userCategories) {
                 if (category.isProfit()) {
-//                    isCategoryExists = true;
-//                    break;
                     currentCategories.add(category);
                 }
             }
@@ -37,18 +34,15 @@ public class BudgetHandler {
             isProfit = false;
             for (Category category: userCategories) {
                 if (!category.isProfit()) {
-//                    isCategoryExists = true;
-//                    break;
                     currentCategories.add(category);
                 }
             }
 
         } else {
-            System.out.println("Похоже, вы ввели неверную команду, попробуйте ещё раз.");
+            System.out.println("Вы ввели неверную команду, попробуйте ещё раз.");
             return user;
         }
         if (currentCategories.isEmpty()) {
-//        if (!isCategoryExists) {
             if (isProfit) {
                 System.out.println("Сначала вам нужно создать категорию операции дохода");
                 return user;
@@ -59,11 +53,11 @@ public class BudgetHandler {
         }
         System.out.println("Введите сумму операции:");
         String sumType = scanner.nextLine();
-        float amount = 0;
+        double amount = 0;
         try {
-            amount = Float.parseFloat(sumType);
+            amount = Double.parseDouble(sumType);
         } catch (NumberFormatException e) {
-            System.out.println("Похоже, вы ввели неверное число, попробуйте ещё раз.");
+            System.out.println("Вы ввели неверное число, попробуйте ещё раз.");
             return user;
         }
         System.out.println("Введите номер категории операции. Ваши категории:");
@@ -76,13 +70,13 @@ public class BudgetHandler {
             DataBase.addOperation(new NewOperation(user, curCategory, amount));
             System.out.println("Операция успешно добавлена!");
         } catch (Exception e) {
-            System.out.println("Похоже, вы ввели неверное число, попробуйте ещё раз.");
+            System.out.println("Вы ввели неверное число, попробуйте ещё раз.");
             return user;
         }
         return user;
     }
 
-    public static User editCategoryGateway(DataBase DataBase, User user) {
+    public static User editCategoryGateway(DataBase DataBase, User user, Scanner scanner) {
         User refreshUser = user;
         System.out.println("""
                 Введите, что вы хотите сделать:
@@ -90,20 +84,20 @@ public class BudgetHandler {
                 2 -> Изменить бюджет на категорию""");
         switch (scanner.nextLine()) {
             case "1" : {
-                refreshUser = addCategory(DataBase, user);
+                refreshUser = addCategory(DataBase, user, scanner);
                 break;
             }
             case "2" : {
-                refreshUser = editCategoryQuota(DataBase, user);
+                refreshUser = editCategoryQuota(DataBase, user, scanner);
                 break;
             }
             default:
-                System.out.println("Похоже, вы ввели неверное число, попробуйте ещё раз."); break;
+                System.out.println("Вы ввели неверное число, попробуйте ещё раз."); break;
         }
         return refreshUser;
     }
 
-    private static User addCategory(DataBase DataBase, User user) {
+    private static User addCategory(DataBase DataBase, User user, Scanner scanner) {
         System.out.println("Введите название новой категории:");
         String newName = scanner.nextLine();
         System.out.println("""
@@ -115,15 +109,15 @@ public class BudgetHandler {
         if (userIsProfit.equals("1")) newIsProfit = true;
         else if (userIsProfit.equals("2")) {}
         else {
-            System.out.println("Похоже, вы ввели неверное значение, попробуйте ещё раз.");
+            System.out.println("Вы ввели неверное значение, попробуйте ещё раз.");
             return user;
         }
         System.out.println("Введите бюджет на данную категорию:");
-        float newQuota = 0;
+        double newQuota = 0;
         try {
-            newQuota = Float.parseFloat(scanner.nextLine());
+            newQuota = Double.parseDouble(scanner.nextLine());
         } catch (Exception e) {
-            System.out.println("Похоже, вы ввели неверное число, попробуйте ещё раз.");
+            System.out.println("Вы ввели неверное число, попробуйте ещё раз.");
             return user;
         }
         int newId = 1;
@@ -141,7 +135,7 @@ public class BudgetHandler {
         System.out.println("Категория " + newCategory.getName() + " успешно добавлена!");
         return user;
     }
-    private static User editCategoryQuota(DataBase DataBase, User user) {
+    private static User editCategoryQuota(DataBase DataBase, User user, Scanner scanner) {
         ArrayList<Category> userCategories = DataBase.getAllUserCategories(user);
         StringBuilder textCategories = new StringBuilder("Введите номер категории операции. Ваши категории:\n");
         for (Category category: userCategories) {
@@ -165,17 +159,17 @@ public class BudgetHandler {
 
                 }
             } catch (Exception e) {
-                System.out.println("Похоже, вы ввели неверное значение, попробуйте ещё раз.");
+                System.out.println("Вы ввели неверное значение, попробуйте ещё раз.");
                 return user;
             }
         } catch (Exception e) {
-            System.out.println("Похоже, вы ввели неверное число, попробуйте ещё раз.");
+            System.out.println("Вы ввели неверное число, попробуйте ещё раз.");
             return user;
         }
         return user;
     }
 
-    public static User transferMoney(DataBase DataBase, User user) {
+    public static User transferMoney(DataBase DataBase, User user, Scanner scanner) {
         Category transferOutCategory = null;
         float newQuota = 0;
         for (Category cat : user.getCategories()) {
@@ -202,7 +196,7 @@ public class BudgetHandler {
                 user.getCategories().add(newCategory);
                 DataBase.updateUser(user);
             } catch (Exception e) {
-                System.out.println("Похоже, вы ввели неверное значение, попробуйте ещё раз.");
+                System.out.println("Вы ввели неверное значение, попробуйте ещё раз.");
             }
         }
 
@@ -215,21 +209,21 @@ public class BudgetHandler {
             return user;
         }
         String sumToSend = scanner.nextLine();
-        float amountToSend = 0;
+        double amountToSend = 0;
         try {
             if (Objects.equals(sumToSend, "0")) {
                 System.out.println("Сумма перевода равна 0, операция не будет выполнена. Возврат в главное меню...");
                 return user;
             } else {
-                amountToSend = Float.parseFloat(sumToSend);
+                amountToSend = Double.parseDouble(sumToSend);
             }
         } catch (Exception e) {
-            System.out.println("Похоже, вы ввели неверное значение, попробуйте ещё раз.");
+            System.out.println("Вы ввели неверное значение, попробуйте ещё раз.");
             return user;
         }
 
         if (amountToSend == 0) {
-            System.out.println("Похоже, вы ввели неверное значение, попробуйте ещё раз.");
+            System.out.println("Вы ввели неверное значение, попробуйте ещё раз.");
         } else {
             boolean isSent = DataBase.transferToUserByLogin(reseiverLogin, amountToSend);
             if (isSent) {

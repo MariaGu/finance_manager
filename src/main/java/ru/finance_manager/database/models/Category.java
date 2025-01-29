@@ -18,16 +18,8 @@ public class Category {
         return id;
     }
 
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public double getQuota() {
@@ -42,7 +34,4 @@ public class Category {
         return isProfit;
     }
 
-    public void setProfit(boolean profit) {
-        isProfit = profit;
-    }
 }

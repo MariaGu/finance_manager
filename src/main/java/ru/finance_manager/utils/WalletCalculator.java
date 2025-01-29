@@ -7,16 +7,16 @@ import ru.finance_manager.database.models.User;
 
 import java.util.*;
 
-public class BudgetCalculator {
+public class WalletCalculator {
     static Scanner scanner = new Scanner(System.in);
     public static void printTotalBudgetAmount(DataBase DataBase, User user) {
         double profit = 0;
         double notProfit = 0;
         for (Operation operation : DataBase.getAllUserOperations(user)) {
-            if (operation.category.isProfit) {
-                profit += operation.amount;
+            if (operation.getCategory().isProfit()) {
+                profit += operation.getAmount();
             } else {
-                notProfit += operation.amount;
+                notProfit += operation.getAmount();
             }
         }
         System.out.println("Анализ вашего бюджета:\n" +
@@ -31,24 +31,24 @@ public class BudgetCalculator {
         HashMap<Category, Double> profitCategories = new HashMap<>();
         HashMap<Category, Double> nonProfitCategories = new HashMap<>();
         for (Operation operation : dataBase.getAllUserOperations(user)) {
-            if (operation.category.isProfit) {
-                profit += operation.amount;
-                Double curOpAmount = profitCategories.get(operation.category);
+            if (operation.getCategory().isProfit()) {
+                profit += operation.getAmount();
+                Double curOpAmount = profitCategories.get(operation.getCategory());
                 if (curOpAmount == null) {
-                    profitCategories.put(operation.category, operation.amount);
+                    profitCategories.put(operation.getCategory(), operation.getAmount());
                 } else {
-                    curOpAmount += operation.amount;
-                    profitCategories.put(operation.category, curOpAmount);
+                    curOpAmount += operation.getAmount();
+                    profitCategories.put(operation.getCategory(), curOpAmount);
                 }
 
             } else {
-                notProfit += operation.amount;
-                Double curOpAmount = nonProfitCategories.get(operation.category);
+                notProfit += operation.getAmount();
+                Double curOpAmount = nonProfitCategories.get(operation.getCategory());
                 if (curOpAmount == null) {
-                    nonProfitCategories.put(operation.category, operation.amount);
+                    nonProfitCategories.put(operation.getCategory(), operation.getAmount());
                 } else {
-                    curOpAmount += operation.amount;
-                    nonProfitCategories.put(operation.category, curOpAmount);
+                    curOpAmount += operation.getAmount();
+                    nonProfitCategories.put(operation.getCategory(), curOpAmount);
                 }
 
             }
@@ -57,10 +57,10 @@ public class BudgetCalculator {
         StringBuilder nonProfitString = new StringBuilder();
 
         for (Map.Entry<Category, Double> entry : profitCategories.entrySet()) {
-            profitString.append(entry.getKey().name).append(": ").append(entry.getValue()).append("\n");
+            profitString.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
         }
         for (Map.Entry<Category, Double> entry : nonProfitCategories.entrySet()) {
-            nonProfitString.append(entry.getKey().name).append(": ").append(entry.getValue()).append(", Оставшийся бюджет: ").append(entry.getKey().quota-entry.getValue()).append("\n");
+            nonProfitString.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append(", Оставшийся бюджет: ").append(entry.getKey().getQuota()-entry.getValue()).append("\n");
         }
 
         System.out.println("Анализ вашего бюджета:\n" +
@@ -77,7 +77,7 @@ public class BudgetCalculator {
     public static void printCalculationByCategory(DataBase DataBase, User user) {
         System.out.println("Введите номер интересующей вас категории (при выборе нескольких - перечислите через запятую):");
         for (Category category: user.getCategories()) {
-            System.out.println(user.getCategories().indexOf(category) + " -> " + category.name + ". Лимит категории: " + category.quota + ".\n");
+            System.out.println(user.getCategories().indexOf(category) + " -> " + category.getName() + ". Лимит категории: " + category.getQuota() + ".\n");
         }
         String userInput = scanner.nextLine();
         ArrayList<Category> selectedCategories = new ArrayList<>();
@@ -92,32 +92,32 @@ public class BudgetCalculator {
         }
         ArrayList<Integer> selectedCategoriesID = new ArrayList<>();
         for (Category cat: selectedCategories) {
-            selectedCategoriesID.add(cat.id);
+            selectedCategoriesID.add(cat.getId());
         }
         double profit = 0;
         double notProfit = 0;
         HashMap<Category, Double> profitCategories = new HashMap<>();
         HashMap<Category, Double> nonProfitCategories = new HashMap<>();
         for (Operation operation : DataBase.getAllUserOperations(user)) {
-            if (selectedCategoriesID.contains(operation.category.id)) {
-                if (operation.category.isProfit) {
-                    profit += operation.amount;
-                    Double curOpAmount = profitCategories.get(operation.category);
+            if (selectedCategoriesID.contains(operation.getCategory().getId())) {
+                if (operation.getCategory().isProfit()) {
+                    profit += operation.getAmount();
+                    Double curOpAmount = profitCategories.get(operation.getCategory());
                     if (curOpAmount == null) {
-                        profitCategories.put(operation.category, operation.amount);
+                        profitCategories.put(operation.getCategory(), operation.getAmount());
                     } else {
-                        curOpAmount += operation.amount;
-                        profitCategories.put(operation.category, curOpAmount);
+                        curOpAmount += operation.getAmount();
+                        profitCategories.put(operation.getCategory(), curOpAmount);
                     }
 
                 } else {
-                    notProfit += operation.amount;
-                    Double curOpAmount = nonProfitCategories.get(operation.category);
+                    notProfit += operation.getAmount();
+                    Double curOpAmount = nonProfitCategories.get(operation.getCategory());
                     if (curOpAmount == null) {
-                        nonProfitCategories.put(operation.category, operation.amount);
+                        nonProfitCategories.put(operation.getCategory(), operation.getAmount());
                     } else {
-                        curOpAmount += operation.amount;
-                        nonProfitCategories.put(operation.category, curOpAmount);
+                        curOpAmount += operation.getAmount();
+                        nonProfitCategories.put(operation.getCategory(), curOpAmount);
                     }
 
                 }
@@ -127,10 +127,10 @@ public class BudgetCalculator {
         StringBuilder nonProfitString = new StringBuilder();
 
         for (Map.Entry<Category, Double> entry : profitCategories.entrySet()) {
-            profitString.append(entry.getKey().name).append(": ").append(entry.getValue()).append("\n");
+            profitString.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append("\n");
         }
         for (Map.Entry<Category, Double> entry : nonProfitCategories.entrySet()) {
-            nonProfitString.append(entry.getKey().name).append(": ").append(entry.getValue()).append(", Оставшийся бюджет: ").append(entry.getKey().quota-entry.getValue()).append("\n");
+            nonProfitString.append(entry.getKey().getName()).append(": ").append(entry.getValue()).append(", Оставшийся бюджет: ").append(entry.getKey().getQuota()-entry.getValue()).append("\n");
         }
         if (profit!= 0 && notProfit != 0) {
             System.out.println("Анализ вашего бюджета по выбранным категориям:\n" +

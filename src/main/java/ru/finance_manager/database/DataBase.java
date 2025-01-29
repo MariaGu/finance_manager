@@ -12,67 +12,31 @@ public class DataBase {
     private static final String DATABASE_FILENAME = "database.json";
     private List<User> userDataBase = new ArrayList<>();
     private List<Operation> operationDataBase = new ArrayList<>();
-    private List<Category> categoriesDataBase = new ArrayList<>();
 
-
-    //    Operations
     public Operation addOperation(NewOperation userOperation) {
-        int id = 1;
-        if (!operationDataBase.isEmpty()) {
-            id = operationDataBase.get(operationDataBase.size() - 1).getId() + 1;
-        }
-        Operation newOperation = new Operation(id, userOperation.getUser(), userOperation.getCategory(), userOperation.getAmount());
+        Operation newOperation = new Operation(
+                operationDataBase.size() + 1,
+                userOperation.getUser(),
+                userOperation.getCategory(),
+                userOperation.getAmount());
         operationDataBase.add(newOperation);
         saveToFile();
         return newOperation;
     }
 
-    public void updateOperation(Operation userOperation) {
-        for (Operation operation : operationDataBase) {
-            if (Objects.equals(operation.getId(), userOperation.getId())) {
-                int indexToReplace = operationDataBase.indexOf(operation);
-                operationDataBase.set(indexToReplace, userOperation);
-            }
-        }
-        saveToFile();
-    }
-
-    public Operation getOperationByID(int operationID) {
-        for (Operation operation : operationDataBase) {
-            if (Objects.equals(operation.getId(), operationID)) return operation;
-        }
-        return null;
-    }
-
-    public boolean removeOperationByID(int operationID) {
-        for (Operation operation : operationDataBase) {
-            if (Objects.equals(operation.getId(), operationID)) {
-                operationDataBase.remove(operation);
-                saveToFile();
-                return true;
-            }
-        }
-        saveToFile();
-        return false;
-    }
 
     public ArrayList<Operation> getAllUserOperations(User user) {
         ArrayList<Operation> outList = new ArrayList<>();
         for (Operation link : operationDataBase) {
-            if (Objects.equals(link.getUser().getLogin(), user.getLogin())) {
+            if (link.getUser().getLogin().equals(user.getLogin())) {
                 outList.add(link);
             }
         }
         return outList;
     }
 
-    //    Users
     public User addUser(NewUser user) {
-        int id = 1;
-        if (!userDataBase.isEmpty()) {
-            id = userDataBase.get(userDataBase.size() - 1).getId() + 1;
-        }
-        User newUser = new User(id, user.getLogin(), user.getPassword(), user.getCategories());
+        User newUser = new User(userDataBase.size() + 1, user.getLogin(), user.getPassword(), user.getCategories());
         userDataBase.add(newUser);
         saveToFile();
         return newUser;
@@ -80,7 +44,7 @@ public class DataBase {
 
     public User authUser(String login, String password) {
         for (User user : userDataBase) {
-            if (Objects.equals(user.getLogin(), login)) {
+            if (user.getLogin().equals(login)) {
                 if (user.checkByPassword(password)) {
                     return user;
                 }
@@ -91,7 +55,7 @@ public class DataBase {
 
     public boolean checkLogin(String login) {
         for (User user : userDataBase) {
-            if (Objects.equals(user.getLogin(), login)) {
+            if (user.getLogin().equals(login)) {
                 return true;
             }
         }
@@ -100,7 +64,7 @@ public class DataBase {
 
     public void updateUser(User curUser) {
         for (User user : userDataBase) {
-            if (Objects.equals(user.getId(), curUser.getId())) {
+            if (user.getId()== curUser.getId()) {
                 int indexToReplace = userDataBase.indexOf(user);
                 userDataBase.set(indexToReplace, curUser);
             }
@@ -108,10 +72,10 @@ public class DataBase {
         saveToFile();
     }
 
-    public boolean transferToUserByLogin(String login, float amount) {
+    public boolean transferToUserByLogin(String login, double amount) {
         User curUser = null;
         for (User user : userDataBase) {
-            if (Objects.equals(user.getLogin(), login)) {
+            if (user.getLogin().equals(login)) {
                 curUser = user;
                 break;
             }
@@ -119,7 +83,7 @@ public class DataBase {
         if (curUser == null) return false;
         Category transferInCategory = null;
         for (Category cat : curUser.getCategories()) {
-            if (Objects.equals(cat.getName(), "Входящие переводы") && cat.isProfit()) {
+            if (cat.getName().equals("Входящие переводы") && cat.isProfit()) {
                 transferInCategory = cat;
                 break;
             }
@@ -163,7 +127,7 @@ public class DataBase {
             Gson gson = new Gson();
             return gson.fromJson(reader, DataBase.class);
         } catch (Exception e) {
-            e.printStackTrace();
+//            System.out.println("Старая база не считана");
             return new DataBase();
         }
     }
