@@ -8,7 +8,7 @@ import ru.finance_manager.database.models.User;
 import java.util.*;
 
 public class WalletCalculator {
-    static Scanner scanner = new Scanner(System.in);
+
     public static void printTotalBudgetAmount(DataBase DataBase, User user) {
         double profit = 0;
         double notProfit = 0;
@@ -25,7 +25,7 @@ public class WalletCalculator {
                 "\nОстаток: " + (profit - notProfit));
 
     }
-    public static void printDetailAmount(DataBase dataBase, User user) {
+    public static void printDetailAmount(DataBase dataBase, User user, Scanner scanner) {
         double profit = 0;
         double notProfit = 0;
         HashMap<Category, Double> profitCategories = new HashMap<>();
@@ -69,12 +69,9 @@ public class WalletCalculator {
                 "\n\nОбщие расходы: "+ notProfit +
                 "\nБюджет по категориям: \n" + nonProfitString +
                 "\n\nОстаток: " + (profit - notProfit));
-
-
-
-
     }
-    public static void printCalculationByCategory(DataBase DataBase, User user) {
+
+    public static void printCalculationByCategory(DataBase DataBase, User user, Scanner scanner) {
         System.out.println("Введите номер интересующей вас категории (при выборе нескольких - перечислите через запятую):");
         for (Category category: user.getCategories()) {
             System.out.println(user.getCategories().indexOf(category) + " -> " + category.getName() + ". Лимит категории: " + category.getQuota() + ".\n");
@@ -151,9 +148,6 @@ public class WalletCalculator {
         } else {
             System.out.println("Не найдено операций по выбранным категориям");
         }
-
     }
-
-
 }
 

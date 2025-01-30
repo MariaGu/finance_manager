@@ -37,6 +37,7 @@ public class Main {
                 printWelcomeMenu();
             }
         }
+        dataBase.saveToFile();
         scanner.close();
     }
 
@@ -84,8 +85,7 @@ public class Main {
 
     private static void printWalletMenu() {
         System.out.println("""
-                   Добро пожаловать в личный кошелек!
-                   Введите номер пункта меню для выбора действия:
+                   Введите номер пункта меню Электронного кошелька для выбора действия:
                 1 -> Добавить операцию;
                 2 -> Управлять категориями;
                 3 -> Вывести общую сумму доходов/расходов;
@@ -98,39 +98,32 @@ public class Main {
 
     private static void enterWallet(Scanner scanner, DataBase dataBase, User user) {
         printWalletMenu();
-        String userChoice = scanner.nextLine();
 
-        switch (userChoice) {
-            case "6": {
-                System.out.println("Вы успешно вышли из электронного кошелька'!");
+        while (true) {
+            String s = scanner.nextLine();
+            if (s.equals("6")) {
+                System.out.println("Вы успешно вышли из электронного кошелька!");
                 break;
-            }
-
-            case "1": {
+            } else if (s.equals("1")) {
                 WalletHandler.addOperation(dataBase, user, scanner);
-                break;
-            }
-            case "2": {
-                WalletHandler.editCategoryGateway(dataBase, user, scanner);
-                break;
-            }
-            case "3": {
-                WalletCalculator.printTotalBudgetAmount(dataBase, user);
-                break;
-            }
-            case "4": {
-                WalletCalculator.printDetailAmount(dataBase, user);
-                break;
-            }
-            case "5": {
-                WalletCalculator.printCalculationByCategory(dataBase, user);
-                break;
-            }
-            default:
-                System.out.println("Вы ввели неверную команду - попробуйте ещё раз.");
                 printWalletMenu();
-                break;
+            } else if (s.equals("2")) {
+                WalletHandler.editCategoryGateway(dataBase, user, scanner);
+                printWalletMenu();
+            } else if (s.equals("3")) {
+                WalletCalculator.printTotalBudgetAmount(dataBase, user);
+                printWalletMenu();
+            } else if (s.equals("4")) {
+                WalletCalculator.printDetailAmount(dataBase, user, scanner);
+                printWalletMenu();
+            } else if (s.equals("5")) {
+                WalletCalculator.printCalculationByCategory(dataBase, user, scanner);
+                printWalletMenu();
+            } else {
+                System.out.println("Операция не поддерживается");
+                printWalletMenu();
+            }
         }
-
     }
+
 }

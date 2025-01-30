@@ -14,10 +14,6 @@ public class Operation {
         this.amount = amount;
     }
 
-    public int getId() {
-        return id;
-    }
-
     public User getUser() {
         return user;
     }

@@ -6,7 +6,6 @@ import ru.finance_manager.database.models.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class DataBase {
     private static final String DATABASE_FILENAME = "database.json";
@@ -20,25 +19,23 @@ public class DataBase {
                 userOperation.getCategory(),
                 userOperation.getAmount());
         operationDataBase.add(newOperation);
-        saveToFile();
         return newOperation;
     }
 
 
     public ArrayList<Operation> getAllUserOperations(User user) {
-        ArrayList<Operation> outList = new ArrayList<>();
+        ArrayList<Operation> allUserOperations = new ArrayList<>();
         for (Operation link : operationDataBase) {
             if (link.getUser().getLogin().equals(user.getLogin())) {
-                outList.add(link);
+                allUserOperations.add(link);
             }
         }
-        return outList;
+        return allUserOperations;
     }
 
     public User addUser(NewUser user) {
         User newUser = new User(userDataBase.size() + 1, user.getLogin(), user.getPassword(), user.getCategories());
         userDataBase.add(newUser);
-        saveToFile();
         return newUser;
     }
 
@@ -64,47 +61,10 @@ public class DataBase {
 
     public void updateUser(User curUser) {
         for (User user : userDataBase) {
-            if (user.getId()== curUser.getId()) {
-                int indexToReplace = userDataBase.indexOf(user);
-                userDataBase.set(indexToReplace, curUser);
+            if (user.getId() == curUser.getId()) {
+                userDataBase.set(userDataBase.indexOf(user), curUser);
             }
         }
-        saveToFile();
-    }
-
-    public boolean transferToUserByLogin(String login, double amount) {
-        User curUser = null;
-        for (User user : userDataBase) {
-            if (user.getLogin().equals(login)) {
-                curUser = user;
-                break;
-            }
-        }
-        if (curUser == null) return false;
-        Category transferInCategory = null;
-        for (Category cat : curUser.getCategories()) {
-            if (cat.getName().equals("Входящие переводы") && cat.isProfit()) {
-                transferInCategory = cat;
-                break;
-            }
-        }
-        if (transferInCategory == null) {
-
-            float newQuota = 0;
-            int newId = 1;
-            if (!curUser.getCategories().isEmpty()) {
-                newId = curUser.getCategories().get(curUser.getCategories().size() - 1).getId() + 1;
-            }
-            Category newCategory = new Category(newId, "Входящие переводы", newQuota, true);
-            curUser.getCategories().add(newCategory);
-            transferInCategory = newCategory;
-            updateUser(curUser);
-        }
-        NewOperation incomeOp = new NewOperation(curUser, transferInCategory, amount);
-        addOperation(incomeOp);
-        saveToFile();
-        return true;
-
     }
 
     public ArrayList<Category> getAllUserCategories(User user) {
@@ -112,11 +72,12 @@ public class DataBase {
     }
 
 
-    private void saveToFile() {
+    public void saveToFile() {
         try (Writer writer = new FileWriter(DATABASE_FILENAME)) {
             Gson gson = new Gson();
             gson.toJson(this, writer);
         } catch (IOException e) {
+            System.out.println("Ошибка сохранения в файл");
             e.printStackTrace();
         }
     }
